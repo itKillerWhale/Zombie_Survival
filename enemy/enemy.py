@@ -1,14 +1,13 @@
 import pygame
 
+from load_image import load_image
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, enemy_group, all_sprites):
         super().__init__(enemy_group, all_sprites)
 
-        playerx, playery = player_group.sprites[0].rect.x, player_group.sprites[0].rect.y
-        delta_x, delta_y = playerx - self.rect.x, playery - self.rect.y
-        S = ((self.rect.x - playerx) ** 2 + (self.rect.y - playerx) ** 2) ** (1 / 2)
-        self.move_x, self.move_y = delta_x / S, delta_y / S
+        self.move_x, self.move_y = 0, 0
 
         self.speedx = 3
         self.speedy = 3
@@ -21,9 +20,10 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x += self.move_x
         self.rect.y += self.move_y
 
-    def move_to_player(self):
-        playerx, playery = player_group.sprites[0].rect.x, player_group.sprites[0].rect.y
-        delta_x, delta_y = playerx - self.rect.x, playery - self.rect.y
-        S = ((self.rect.x - playerx) ** 2 + (self.rect.y - playerx) ** 2) ** (1 / 2)
+    def move_to_player(self, entity):
+        entityx, entityy = entity.rect.x, entity.rect.y
+        delta_x, delta_y = entityx - self.rect.x, entityy - self.rect.y
+        S = ((self.rect.x - entityx) ** 2 + (self.rect.y - entityx) ** 2) ** (1 / 2)
         self.move_x, self.move_y = delta_x / S, delta_y / S
+        print(self.move_x ,self.move_y)
 
