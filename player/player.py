@@ -2,6 +2,7 @@ import pygame
 
 from functions import load_image
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, player_group, all_sprites):
         super().__init__(player_group, all_sprites)
