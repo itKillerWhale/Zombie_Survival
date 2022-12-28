@@ -25,5 +25,4 @@ class Enemy(pygame.sprite.Sprite):
         delta_x, delta_y = entityx - self.rect.x, entityy - self.rect.y
         S = ((self.rect.x - entityx) ** 2 + (self.rect.y - entityx) ** 2) ** (1 / 2)
         self.move_x, self.move_y = delta_x / S, delta_y / S
-        print(self.move_x ,self.move_y)
 
