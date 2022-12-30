@@ -25,7 +25,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
 
     player = Player(50, 50, player_group, all_sprites)
-    enemy = Enemy(1000, 700, enemy_group, all_sprites)
+    enemy = Enemy(10, 1000, 700, enemy_group, all_sprites)
     enemy.move_to_player(player_group.sprites()[0])
 
     move = (False, False, False, False)

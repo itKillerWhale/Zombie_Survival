@@ -4,8 +4,10 @@ from functions import load_image
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, enemy_group, all_sprites):
+    def __init__(self, hp, x, y, enemy_group, all_sprites):
         super().__init__(enemy_group, all_sprites)
+
+        self.hp = hp
 
         self.move_x, self.move_y = 0, 0
 
@@ -25,4 +27,7 @@ class Enemy(pygame.sprite.Sprite):
         delta_x, delta_y = entityx - self.rect.x, entityy - self.rect.y
         S = ((self.rect.x - entityx) ** 2 + (self.rect.y - entityx) ** 2) ** (1 / 2)
         self.move_x, self.move_y = delta_x / S, delta_y / S
+
+    def hit(self, damage):
+        self.hp -= damage
 
