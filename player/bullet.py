@@ -5,6 +5,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, moving_objects_group, player_pos, pos):
         super().__init__(moving_objects_group)
         self.speed = 20
+        self.damage = 10
         self.bullet_x, self.bullet_y = player_pos.x, player_pos.y
         try:
             self.move_x = (pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
@@ -21,7 +22,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image.fill('white')
         self.rect = self.image.get_rect().move(player_pos.x, player_pos.y)
 
-    def update(self):
+    def update(self, enemy_group):
         if self.rect.x >= 1500 or self.rect.y >= 1000:  # Через какое кол-во пикселей удаляется пуля
             self.image = pygame.Surface((10, 10))
             self.rect.x, self.rect.y = 5000, 5000
@@ -29,3 +30,6 @@ class Bullet(pygame.sprite.Sprite):
             self.bullet_x, self.bullet_y = self.bullet_x + self.speed * self.move_x, \
                                            self.bullet_y + self.speed * self.move_y / self.koeff_x_to_y
             self.rect.x, self.rect.y = self.bullet_x, self.bullet_y
+            for enemy in enemy_group:
+                if self.rect.colliderect(enemy.rect):
+                    enemy.hit(self.damage)

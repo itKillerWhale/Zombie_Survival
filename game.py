@@ -64,7 +64,7 @@ if __name__ == '__main__':
         left, right, up, down = move
         player_group.update(left, right, up, down)
         enemy_group.update()
-        bullets_group.update()
+        bullets_group.update(enemy_group)
 
         all_sprites.draw(screen)
         bullets_group.draw(screen)

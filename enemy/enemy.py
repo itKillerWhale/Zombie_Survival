@@ -20,6 +20,8 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.move_x
         self.rect.y += self.move_y
+        if self.hp <= 0:
+            self.kill()
 
     def move_to_player(self, entity):
         entityx, entityy = entity.rect.x, entity.rect.y
