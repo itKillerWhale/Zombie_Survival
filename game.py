@@ -30,11 +30,7 @@ if __name__ == '__main__':
     player = Player(50, 50, player_group, all_sprites)
     camera = Camera(width, height)
     enemy = Enemy(50, 1000, 700, enemy_group, all_sprites)
-    enemy1 = Enemy(50, 1000, 700, enemy_group, all_sprites)
-    enemy2 = Enemy(50, 500, 800, enemy_group, all_sprites)
-    enemy3 = Enemy(50, 900, 1300, enemy_group, all_sprites)
-    enemy4 = Enemy(50, 300, 700, enemy_group, all_sprites)
-    enemy5 = Enemy(50, 6000, 500, enemy_group, all_sprites)
+
     enemy.move_to_player(player_group.sprites()[0])
 
     move = (False, False, False, False)
@@ -66,8 +62,8 @@ if __name__ == '__main__':
         enemy_group.update()
         bullets_group.update(enemy_group)
 
-        all_sprites.draw(screen)
         bullets_group.draw(screen)
+        enemy_group.draw(screen)
         player_group.draw(screen)
         pygame.display.flip()
         clock.tick(v)

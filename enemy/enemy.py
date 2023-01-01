@@ -10,8 +10,8 @@ class Enemy(pygame.sprite.Sprite):
         self.hp = hp
         self.move_x, self.move_y = 0, 0
 
-        self.speedx = 3
-        self.speedy = 3
+        self.speedx = 1
+        self.speedy = 1
 
         self.image = pygame.Surface((20, 20))
         self.image.fill('green')
@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite):
         entityx, entityy = entity.rect.x, entity.rect.y
         delta_x, delta_y = entityx - self.rect.x, entityy - self.rect.y
         S = ((self.rect.x - entityx) ** 2 + (self.rect.y - entityx) ** 2) ** (1 / 2)
-        self.move_x, self.move_y = delta_x / S, delta_y / S
+        self.move_x, self.move_y = delta_x / S * self.speedx, delta_y / S * self.speedy
 
     def hit(self, damage):
         self.hp -= damage

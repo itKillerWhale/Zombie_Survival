@@ -6,6 +6,7 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__(moving_objects_group)
         self.speed = 20
         self.damage = 10
+        self.uses = 1
         self.bullet_x, self.bullet_y = player_pos.x, player_pos.y
         try:
             self.move_x = (pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
@@ -33,3 +34,6 @@ class Bullet(pygame.sprite.Sprite):
             for enemy in enemy_group:
                 if self.rect.colliderect(enemy.rect):
                     enemy.hit(self.damage)
+                    self.uses -= 1
+                    if self.uses == 0:
+                        self.kill()
