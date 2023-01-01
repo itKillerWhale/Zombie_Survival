@@ -8,7 +8,6 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(enemy_group, all_sprites)
 
         self.hp = hp
-
         self.move_x, self.move_y = 0, 0
 
         self.speedx = 3
@@ -30,4 +29,3 @@ class Enemy(pygame.sprite.Sprite):
 
     def hit(self, damage):
         self.hp -= damage
-
