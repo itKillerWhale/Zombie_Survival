@@ -4,8 +4,7 @@ from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
 from enemy.enemy import Enemy
-from world.world import World
-
+from world.world import Tile
 from functions import load_image
 
 pygame.init()
@@ -29,9 +28,13 @@ if __name__ == '__main__':
 
     player = Player(50, 50, player_group, all_sprites)
     camera = Camera(width, height)
-    enemy = Enemy(50, 1000, 700, enemy_group, all_sprites)
+    # enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
 
-    enemy.move_to_player(player_group.sprites()[0])
+    # enemy.move_to_player(player.rect)
+    for y in range(-160, 641, 80):
+        for x in range(-160, 1201, 80):
+            Tile(x, y, tiles_group, all_sprites)
+    # title = Tile(-160, 50, tiles_group, all_sprites)
 
     move = (False, False, False, False)
 
@@ -39,8 +42,10 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 Bullet(bullets_group, player.rect, event.pos)
+
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
@@ -51,20 +56,25 @@ if __name__ == '__main__':
 
         screen.fill((0, 0, 0))
 
-        enemy.move_to_player(player_group.sprites()[0])
-
-        camera.update(player)
-        for sprite in all_sprites:
-            camera.apply(sprite)
+        # enemy.move_to_player(player.rect)
 
         left, right, up, down = move
         player_group.update(left, right, up, down)
         enemy_group.update()
         bullets_group.update(enemy_group)
 
+        camera.update(player)
+        for sprite in all_sprites:
+            camera.apply(sprite)
+
+        tiles_group.update(player.rect)
+        print(player.rect.y - tiles_group.sprites()[0].rect.y)
+
+        tiles_group.draw(screen)
         bullets_group.draw(screen)
         enemy_group.draw(screen)
         player_group.draw(screen)
+
         pygame.display.flip()
         clock.tick(v)
     pygame.quit()

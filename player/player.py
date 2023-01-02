@@ -6,8 +6,8 @@ from functions import load_image
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, player_group, all_sprites):
         super().__init__(player_group, all_sprites)
-        self.speedx = 3
-        self.speedy = 3
+        self.speedx = 5
+        self.speedy = 5
         self.image = pygame.Surface((20, 20))
         self.image.fill('red')
         self.rect = self.image.get_rect().move(x, y)  # Координаты спавна персонажа
