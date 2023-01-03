@@ -26,11 +26,11 @@ if __name__ == '__main__':
     player_group = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
 
-    player = Player(50, 50, player_group, all_sprites)
+    player = Player(30, 30, player_group, all_sprites)
     camera = Camera(width, height)
-    # enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
+    enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
 
-    # enemy.move_to_player(player.rect)
+    enemy.move_to_player(player.rect)
     for y in range(-160, 641, 80):
         for x in range(-160, 1201, 80):
             Tile(x, y, tiles_group, all_sprites)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
         screen.fill((0, 0, 0))
 
-        # enemy.move_to_player(player.rect)
+        enemy.move_to_player(player.rect)
 
         left, right, up, down = move
         player_group.update(left, right, up, down)
@@ -68,7 +68,6 @@ if __name__ == '__main__':
             camera.apply(sprite)
 
         tiles_group.update(player.rect)
-        print(player.rect.y - tiles_group.sprites()[0].rect.y)
 
         tiles_group.draw(screen)
         bullets_group.draw(screen)

@@ -19,8 +19,8 @@ class Enemy(pygame.sprite.Sprite):
         self.enemy_x, self.enemy_y = x, y
 
     def update(self):
-        self.enemy_x, self.enemy_y = self.enemy_x + self.speed * self.move_x, \
-                                     self.enemy_y + self.speed * self.move_y / self.koeff_x_to_y
+        self.enemy_x, self.enemy_y = self.rect.x + self.speed * self.move_x, \
+                                     self.rect.y + self.speed * self.move_y / self.koeff_x_to_y
         self.rect.x, self.rect.y = self.enemy_x, self.enemy_y
 
         if self.hp <= 0:
@@ -28,6 +28,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def move_to_player(self, player_pos):
         pos = (self.rect.x, self.rect.y)
+        print(player_pos)
         try:
             self.move_x = -(pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
         except ZeroDivisionError:
@@ -40,8 +41,8 @@ class Enemy(pygame.sprite.Sprite):
         if self.koeff_x_to_y < 1:
             self.speed /= 1 / self.koeff_x_to_y
 
-        # self.move_x = -self.move_x
-        # self.move_y = - self.move_y
+        self.move_x = -self.move_x
+        self.move_y = - self.move_y
 
     def hit(self, damage):
         self.hp -= damage
