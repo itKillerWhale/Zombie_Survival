@@ -40,8 +40,5 @@ class Enemy(pygame.sprite.Sprite):
         if self.koeff_x_to_y < 1:
             self.speed /= 1 / self.koeff_x_to_y
 
-        self.move_x = -self.move_x
-        self.move_y = - self.move_y
-
     def hit(self, damage):
         self.hp -= damage
