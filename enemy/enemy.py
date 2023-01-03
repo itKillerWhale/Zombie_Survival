@@ -28,7 +28,6 @@ class Enemy(pygame.sprite.Sprite):
 
     def move_to_player(self, player_pos):
         pos = (self.rect.x, self.rect.y)
-        print(player_pos)
         try:
             self.move_x = -(pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
         except ZeroDivisionError:
