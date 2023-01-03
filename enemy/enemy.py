@@ -16,29 +16,19 @@ class Enemy(pygame.sprite.Sprite):
         self.image.fill('green')
         self.rect = self.image.get_rect().move(x, y)
 
-        self.enemy_x, self.enemy_y = x, y
+        self.pos = pygame.math.Vector2(x, y)
 
     def update(self):
-        self.enemy_x, self.enemy_y = self.rect.x + self.speed * self.move_x, \
-                                     self.rect.y + self.speed * self.move_y / self.koeff_x_to_y
-        self.rect.x, self.rect.y = self.enemy_x, self.enemy_y
+        self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
         if self.hp <= 0:
             self.kill()
 
     def move_to_player(self, player_pos):
-        pos = (self.rect.x, self.rect.y)
-        try:
-            self.move_x = -(pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
-        except ZeroDivisionError:
-            self.move_x = -1
-        try:
-            self.move_y = -(pos[1] - player_pos.y) / abs(pos[1] - player_pos.y)
-        except ZeroDivisionError:
-            self.move_y = -1
-        self.koeff_x_to_y = abs(pos[0] - player_pos.x) / abs(pos[1] - player_pos.y)
-        if self.koeff_x_to_y < 1:
-            self.speed /= 1 / self.koeff_x_to_y
+        delta_vector = pygame.Vector2(player_pos.center) - self.pos
+        vector_len = delta_vector.length()
+        if vector_len > 0:
+            self.pos += delta_vector / vector_len * min(vector_len, self.speed)
 
     def hit(self, damage):
         self.hp -= damage
