@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 Bullet(bullets_group, player.rect, event.pos)
-                pygame.mixer.Sound("audio/shot.mp3").play()
+                pygame.mixer.Sound("audio/shoot.mp3").play()
 
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
