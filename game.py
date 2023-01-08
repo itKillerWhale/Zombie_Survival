@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from player.player import Player
@@ -29,8 +31,8 @@ if __name__ == '__main__':
     player = Player(30, 30, player_group, all_sprites)
     camera = Camera(width, height)
     enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
-
-    enemy.move_to_player(player.rect)
+    for _ in range(20):
+        Enemy(10, random.randint(-640, 640), random.randint(-360, 360), enemy_group, all_sprites)
     for y in range(-160, 641, 80):
         for x in range(-160, 1201, 80):
             Tile(x, y, tiles_group, all_sprites)
@@ -57,11 +59,9 @@ if __name__ == '__main__':
 
         screen.fill((0, 0, 0))
 
-        enemy.move_to_player(player.rect)
-
         left, right, up, down = move
         player_group.update(left, right, up, down)
-        enemy_group.update()
+        enemy_group.update(player.rect, enemy_group)
         bullets_group.update(enemy_group)
 
         camera.update(player)

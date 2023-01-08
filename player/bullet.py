@@ -7,7 +7,7 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 20
         self.damage = 10
         self.uses = 1
-        self.bullet_x, self.bullet_y = player_pos.x, player_pos.y
+        self.bullet_x, self.bullet_y = player_pos.center[0], player_pos.center[1]
         try:
             self.move_x = (pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
         except ZeroDivisionError:

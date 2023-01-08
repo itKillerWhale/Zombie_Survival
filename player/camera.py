@@ -5,8 +5,7 @@ class Camera:
         self.dy = 0
 
     def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
+        obj.apply_changes(self.dx, self.dy)
 
     def update(self, target):
         self.dx = -(target.rect.x + target.rect.w // 2 - self.width // 2)

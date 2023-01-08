@@ -5,7 +5,6 @@ from functions import load_image
 
 
 class Tile(pygame.sprite.Sprite):
-    kind_of_tiles = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2]
 
     def __init__(self, x, y, tiles_group, all_sprites):
         super().__init__(tiles_group, all_sprites)
@@ -13,6 +12,10 @@ class Tile(pygame.sprite.Sprite):
         self.image = pygame.Surface((80, 80))
         self.generate()
         self.rect = self.image.get_rect().move(x, y)
+
+    def apply_changes(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
 
     def update(self, player_pos):
         if player_pos.x - self.rect.x >= 710:
@@ -32,14 +35,7 @@ class Tile(pygame.sprite.Sprite):
             self.generate()
 
     def generate(self):
-        kind = random.choice(Tile.kind_of_tiles)
-        if kind == 0:
-            self.image.fill('blue')
-        if kind == 1:
-            self.image.fill('black')
-        if kind == 2:
-            self.image.fill('red')
-
+        self.image.fill('#5e9e70')
 
 # class World(pygame.sprite.Sprite):
 #     def __init__(self, height, width, world_group, all_sprites):

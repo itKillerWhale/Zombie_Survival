@@ -18,17 +18,20 @@ class Enemy(pygame.sprite.Sprite):
 
         self.pos = pygame.math.Vector2(x, y)
 
-    def update(self):
-        self.rect.x, self.rect.y = self.pos.x, self.pos.y
+    def apply_changes(self, dx, dy):
+        self.pos.x += dx
+        self.pos.y += dy
 
-        if self.hp <= 0:
-            self.kill()
-
-    def move_to_player(self, player_pos):
-        delta_vector = pygame.Vector2(player_pos.center) - self.pos
+    def update(self, player_pos, other_sprites):
+        delta_vector = pygame.Vector2(player_pos.x, player_pos.y) - self.pos
         vector_len = delta_vector.length()
         if vector_len > 0:
             self.pos += delta_vector / vector_len * min(vector_len, self.speed)
+
+            self.rect.x, self.rect.y = self.pos.x, self.pos.y
+
+        if self.hp <= 0:
+            self.kill()
 
     def hit(self, damage):
         self.hp -= damage
