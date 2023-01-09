@@ -8,13 +8,12 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.player_x, self.player_y = x, y
         self.frames = []
-        self.cut_sheet(load_image('player.png', -1), 6, 6)
+        self.cut_sheet(load_image('resourses/sprites/player.png', -1), 6, 11)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
+        self.image = pygame.transform.scale2x(self.image)
         self.speedx = 5
         self.speedy = 5
-        self.image = pygame.Surface((20, 20))
-        self.image.fill('red')
         self.rect = self.image.get_rect().move(x, y)  # Координаты спавна персонажа
 
     def apply_changes(self, dx, dy):

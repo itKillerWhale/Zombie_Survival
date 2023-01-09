@@ -18,19 +18,19 @@ class Tile(pygame.sprite.Sprite):
         self.rect.y += dy
 
     def update(self, player_pos):
-        if player_pos.x - self.rect.x >= 710:
+        if player_pos.center[0] - self.rect.x >= 720:
             self.rect.x += 1280 + 80
             self.generate()
 
-        elif player_pos.x - self.rect.x <= - 650:
+        elif player_pos.center[0] - self.rect.x <= -640:
             self.rect.x -= 1280 + 80
             self.generate()
 
-        elif player_pos.y - self.rect.y >= 430:
+        elif player_pos.center[1] - self.rect.y >= 440:
             self.rect.y += 720 + 80
             self.generate()
 
-        elif player_pos.y - self.rect.y <= -370:
+        elif player_pos.center[1] - self.rect.y <= -360:
             self.rect.y -= 720 + 80
             self.generate()
 

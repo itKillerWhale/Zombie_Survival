@@ -23,7 +23,7 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.y += dy
 
     def update(self, player_pos, other_sprites):
-        delta_vector = pygame.Vector2(player_pos.x, player_pos.y) - self.pos
+        delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
         vector_len = delta_vector.length()
         if vector_len > 0:
             self.pos += delta_vector / vector_len * min(vector_len, self.speed)

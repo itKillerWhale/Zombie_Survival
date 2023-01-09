@@ -16,8 +16,8 @@ screen = pygame.display.set_mode(size)
 
 if __name__ == '__main__':
     running = True
-    v = 30
-    fps = 60
+    fps = 30
+    frames = 0
     screen.fill(pygame.Color("black"))
     pygame.display.flip()
     clock = pygame.time.Clock()
@@ -31,10 +31,8 @@ if __name__ == '__main__':
     player = Player(30, 30, player_group, all_sprites)
     camera = Camera(width, height)
     enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
-    for _ in range(20):
-        Enemy(10, random.randint(-640, 640), random.randint(-360, 360), enemy_group, all_sprites)
-    for y in range(-160, 641, 80):
-        for x in range(-160, 1201, 80):
+    for y in range(-240, 641, 80):
+        for x in range(-240, 1201, 80):
             Tile(x, y, tiles_group, all_sprites)
     # title = Tile(-160, 50, tiles_group, all_sprites)
 
@@ -47,7 +45,7 @@ if __name__ == '__main__':
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 Bullet(bullets_group, player.rect, event.pos)
-                pygame.mixer.Sound("audio/shoot.mp3").play()
+                pygame.mixer.Sound("resourses/sounds/shoot.mp3").play()
 
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
@@ -58,6 +56,10 @@ if __name__ == '__main__':
                 move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
 
         screen.fill((0, 0, 0))
+        if frames % 1 == 0:
+            x = random.choice([random.randint(-200, 0), random.randint(1280, 1480)])
+            y = random.choice([random.randint(-200, 0), random.randint(720, 920)])
+            Enemy(10, x, y, enemy_group, all_sprites)
 
         left, right, up, down = move
         player_group.update(left, right, up, down)
@@ -75,6 +77,7 @@ if __name__ == '__main__':
         enemy_group.draw(screen)
         player_group.draw(screen)
 
+        frames += 1
         pygame.display.flip()
-        clock.tick(v)
+        clock.tick(fps)
     pygame.quit()

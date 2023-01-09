@@ -9,19 +9,19 @@ class Bullet(pygame.sprite.Sprite):
         self.uses = 1
         self.bullet_x, self.bullet_y = player_pos.center[0], player_pos.center[1]
         try:
-            self.move_x = (pos[0] - player_pos.x) / abs(pos[0] - player_pos.x)
+            self.move_x = (pos[0] - player_pos.center[0]) / abs(pos[0] - player_pos.center[0])
         except ZeroDivisionError:
             self.move_x = 1
         try:
-            self.move_y = (pos[1] - player_pos.y) / abs(pos[1] - player_pos.y)
+            self.move_y = (pos[1] - player_pos.center[1]) / abs(pos[1] - player_pos.center[1])
         except ZeroDivisionError:
             self.move_y = 1
-        self.koeff_x_to_y = abs(pos[0] - player_pos.x) / abs(pos[1] - player_pos.y)
+        self.koeff_x_to_y = abs(pos[0] - player_pos.center[0]) / abs(pos[1] - player_pos.center[1])
         if self.koeff_x_to_y < 1:
             self.speed /= 1 / self.koeff_x_to_y
         self.image = pygame.Surface((10, 10))
         self.image.fill('white')
-        self.rect = self.image.get_rect().move(player_pos.x, player_pos.y)
+        self.rect = self.image.get_rect().move(player_pos.center[0], player_pos.center[1])
 
     def update(self, enemy_group):
         if self.rect.x >= 1500 or self.rect.y >= 1000:  # Через какое кол-во пикселей удаляется пуля
