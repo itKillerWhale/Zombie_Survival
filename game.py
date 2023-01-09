@@ -1,6 +1,7 @@
 import random
 
 import pygame
+import math
 
 from player.player import Player
 from player.camera import Camera
@@ -17,10 +18,12 @@ screen = pygame.display.set_mode(size)
 if __name__ == '__main__':
     running = True
     fps = 30
-    frames = 0
     screen.fill(pygame.Color("black"))
     pygame.display.flip()
     clock = pygame.time.Clock()
+
+    frames = 0
+    game_difficulty = 3
 
     tiles_group = pygame.sprite.Group()
     enemy_group = pygame.sprite.Group()
@@ -56,10 +59,15 @@ if __name__ == '__main__':
                 move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
 
         screen.fill((0, 0, 0))
-        if frames % 1 == 0:
-            x = random.choice([random.randint(-200, 0), random.randint(1280, 1480)])
-            y = random.choice([random.randint(-200, 0), random.randint(720, 920)])
-            Enemy(10, x, y, enemy_group, all_sprites)
+
+        if frames % 60 == 0:
+            for _ in range(round(game_difficulty)):
+                angle = (math.pi / 360) * random.randint(0, 360)
+                x, y = math.cos(angle) * 800 + player.rect.x, math.sin(angle) * 700 + player.rect.y
+                print(x, y)
+                print(player.rect.x, player.rect.y)
+                print(game_difficulty, round(game_difficulty))
+                Enemy(10, x, y, enemy_group, all_sprites)
 
         left, right, up, down = move
         player_group.update(left, right, up, down)
@@ -77,6 +85,7 @@ if __name__ == '__main__':
         enemy_group.draw(screen)
         player_group.draw(screen)
 
+        game_difficulty += 0.0005
         frames += 1
         pygame.display.flip()
         clock.tick(fps)
