@@ -22,7 +22,7 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.x += dx
         self.pos.y += dy
 
-    def update(self, player_pos, other_sprites):
+    def update(self, player_pos, enemy_group):
         delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
         vector_len = delta_vector.length()
         if vector_len > 0:
@@ -32,6 +32,18 @@ class Enemy(pygame.sprite.Sprite):
 
         if self.hp <= 0:
             self.kill()
+
+        if pygame.sprite.spritecollide(self, enemy_group, False):
+            for enemy in pygame.sprite.spritecollide(self, enemy_group, False):
+                enemy_pos = enemy.rect
+                delta_vector = pygame.Vector2(enemy_pos.center[0] - 10,
+                                              enemy_pos.center[1] + 10) - self.pos
+                vector_len = delta_vector.length()
+
+                if vector_len > 0:
+                    self.pos -= delta_vector / vector_len * min(vector_len, self.speed)
+
+                    self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
     def hit(self, damage):
         self.hp -= damage
