@@ -1,6 +1,6 @@
 import pygame
 
-from functions import load_image
+from functions import load_image, cut_sheet
 
 
 class Player(pygame.sprite.Sprite):
@@ -8,10 +8,11 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.player_x, self.player_y = x, y
         self.frames = []
-        self.cut_sheet(load_image('resourses/sprites/player.png', -1), 6, 11)
+        cut_sheet(self, load_image('resourses/sprites/player/player.png', -1), 6, 11)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.image = pygame.transform.scale2x(self.image)
+        self.mask = pygame.mask.from_surface(self.image)
         self.speedx = 5
         self.speedy = 5
         self.rect = self.image.get_rect().move(x, y)  # Координаты спавна персонажа
@@ -19,15 +20,6 @@ class Player(pygame.sprite.Sprite):
     def apply_changes(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy
-
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                self.frames.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
 
     def update(self, left, right, up, down):
         if left:

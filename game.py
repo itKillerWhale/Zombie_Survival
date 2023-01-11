@@ -3,12 +3,12 @@ import random
 import pygame
 import math
 
+from player.level_system import Level
 from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
-from enemy.enemy import Enemy
+from enemy.enemy import Enemy, ExpOrb
 from world.world import Tile
-from functions import load_image
 
 pygame.init()
 pygame.display.set_caption("project")
@@ -26,18 +26,18 @@ if __name__ == '__main__':
     game_difficulty = 3
 
     tiles_group = pygame.sprite.Group()
+    orbs_group = pygame.sprite.Group()
     enemy_group = pygame.sprite.Group()
     bullets_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
 
     player = Player(30, 30, player_group, all_sprites)
+    level = Level(50, 1.5)
     camera = Camera(width, height)
-    enemy = Enemy(50, 400, 400, enemy_group, all_sprites)
     for y in range(-240, 641, 80):
         for x in range(-240, 1201, 80):
             Tile(x, y, tiles_group, all_sprites)
-    # title = Tile(-160, 50, tiles_group, all_sprites)
 
     move = (False, False, False, False)
 
@@ -59,19 +59,19 @@ if __name__ == '__main__':
                 move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
 
         screen.fill((0, 0, 0))
-
+        if pygame.sprite.spritecollideany(player_group.sprites()[0], orbs_group):
+            for orb in pygame.sprite.spritecollide(player_group.sprites()[0], orbs_group, False):
+                level.add_exp(orb.exp)
+                orb.kill()
         if frames % 60 == 0:
             for _ in range(round(game_difficulty)):
-                angle = (math.pi / 360) * random.randint(0, 360)
-                x, y = math.cos(angle) * 800 + player.rect.x, math.sin(angle) * 700 + player.rect.y
-                print(x, y)
-                print(player.rect.x, player.rect.y)
-                print(game_difficulty, round(game_difficulty))
-                Enemy(10, x, y, enemy_group, all_sprites)
+                angle = math.radians(random.randint(0, 360))
+                x, y = math.cos(angle) * 880 + player.rect.x, math.sin(angle) * 600 + player.rect.y
+                Enemy(50, x, y, enemy_group, all_sprites)
 
         left, right, up, down = move
         player_group.update(left, right, up, down)
-        enemy_group.update(player.rect, enemy_group)
+        enemy_group.update(player.rect, orbs_group, enemy_group, all_sprites)
         bullets_group.update(enemy_group)
 
         camera.update(player)
@@ -81,9 +81,11 @@ if __name__ == '__main__':
         tiles_group.update(player.rect)
 
         tiles_group.draw(screen)
+        orbs_group.draw(screen)
         bullets_group.draw(screen)
-        enemy_group.draw(screen)
         player_group.draw(screen)
+        enemy_group.draw(screen)
+        level.update(screen)
 
         game_difficulty += 0.0005
         frames += 1
