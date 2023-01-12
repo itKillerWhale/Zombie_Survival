@@ -33,7 +33,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
 
     player = Player(30, 30, player_group, all_sprites)
-    level = Level(50, 1.5)
+    level = Level(10, 1.2)
     camera = Camera(width, height)
     for y in range(-240, 641, 80):
         for x in range(-240, 1201, 80):
