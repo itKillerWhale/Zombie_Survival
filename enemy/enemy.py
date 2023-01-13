@@ -1,29 +1,19 @@
+import math
 import pygame
-
-from functions import load_image, cut_sheet
-
-PATH = 'resourses/sprites/zombie/'
-ZOMBIE_WALK = [pygame.image.load(image) for image in
-               [PATH + 'Zombie_Walk1.png', PATH + 'Zombie_Walk2.png', PATH + 'Zombie_Walk3.png',
-                PATH + 'Zombie_Walk4.png', PATH + 'Zombie_Walk5.png', PATH + 'Zombie_Walk6.png',
-                PATH + 'Zombie_Walk7.png', PATH + 'Zombie_Walk8.png', PATH + 'Zombie_Walk9.png',
-                PATH + 'Zombie_Walk10.png']]
-
-ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) for image in ZOMBIE_WALK]
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, hp, x, y, enemy_group, all_sprites):
+    def __init__(self, hp, x, y, image, enemy_group, all_sprites):
         super().__init__(enemy_group, all_sprites)
 
         self.hp = hp
         self.move_x, self.move_y = 0, 0
 
-        self.speed = 2
-
+        self.speed = 3
         self.cur_frame = 0
-        self.image = ZOMBIE_WALK[self.cur_frame]
 
+        self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(x, y)
 
         self.pos = pygame.Vector2(x, y)
@@ -32,13 +22,15 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.x += dx
         self.pos.y += dy
 
-    def update(self, player_pos, orbs_group, enemy_group, all_sprites):
+    def update(self, player, image, image2, orbs_group, enemy_group, all_sprites):
+        player_pos = player.rect
         self.cur_frame += 1
         delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
-        if delta_vector.x > 0:
-            self.image = ZOMBIE_WALK[int(self.cur_frame / 2) % 10]
-        else:
-            self.image = ZOMBIE_WALK_REVERSE[int(self.cur_frame / 2) % 10]
+        if math.hypot(player_pos.x - self.rect.x, player_pos.y - self.rect.y) < 900:
+            if delta_vector.x > 0:
+                self.image = image
+            else:
+                self.image = image2
         if not (5 <= int(self.cur_frame / 2) % 10 <= 9):
             vector_len = delta_vector.length()
             if vector_len > 0:
@@ -50,12 +42,13 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
             ExpOrb(1, (self.rect.centerx, self.rect.centery), orbs_group, all_sprites)
 
-        if pygame.sprite.spritecollide(self, enemy_group, False):
-            for enemy in pygame.sprite.spritecollide(self, enemy_group, False):
-                if enemy != self:
+        collides = pygame.sprite.spritecollide(self, enemy_group, False)
+        if collides:
+            for enemy in collides:
+                if enemy != self and pygame.sprite.collide_mask(self, enemy):
                     enemy_pos = enemy.rect
-                    delta_vector = pygame.Vector2(enemy_pos.center[0] - 10,
-                                                  enemy_pos.center[1] + 10) - self.pos
+                    delta_vector = pygame.Vector2(enemy_pos.center[0] - self.rect.centerx,
+                                                  enemy_pos.center[1] - self.rect.centery)
                     vector_len = delta_vector.length()
 
                     if vector_len > 0:
