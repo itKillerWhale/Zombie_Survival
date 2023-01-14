@@ -4,8 +4,7 @@ import pygame
 
 ABILITIES = {'+5% ДМГ': 'player.damage += player.start_damage / 20',
              '+10% ДМГ': 'player.damage += player.start_damage / 10',
-             '+15% ДМГ': 'player.damage += player.start_damage / (100 / 15)',
-             'Замораживат'}
+             '+15% ДМГ': 'player.damage += player.start_damage / (100 / 15)'}
 
 
 class Level:
