@@ -41,6 +41,7 @@ class Player(pygame.sprite.Sprite):
         if self.cur_frame - self.last_hit > 30:
             if pygame.sprite.spritecollideany(self, enemy_group):
                 self.hp[0] -= 1
+                pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
             self.last_hit = self.cur_frame
             try:
                 self.percentage = self.hp[0] / self.hp[1]

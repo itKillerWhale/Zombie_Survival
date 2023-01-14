@@ -77,9 +77,13 @@ if __name__ == '__main__':
             if pygame.sprite.spritecollideany(player_group.sprites()[0], orbs_group):
                 for orb in pygame.sprite.spritecollide(player_group.sprites()[0], orbs_group, False):
                     result = level.add_exp(orb.exp)
+
                     if result:
                         choose_ability = True
                         choose_screen = AbilityChoose()
+                        pygame.mixer.Sound("resourses/sounds/raising_the_level.mp3").play()
+                    else:
+                        pygame.mixer.Sound("resourses/sounds/gaining_experience_sound.mp3").play()
                     orb.kill()
             if frames % 60 == 0:
                 for _ in range(round(game_difficult)):
