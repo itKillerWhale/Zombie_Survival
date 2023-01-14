@@ -22,7 +22,7 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.x += dx
         self.pos.y += dy
 
-    def update(self, player, image, image2, orbs_group, enemy_group, all_sprites):
+    def update(self, player, game_difficult, image, image2, orbs_group, enemy_group, all_sprites):
         player_pos = player.rect
         self.cur_frame += 1
         delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
@@ -31,7 +31,8 @@ class Enemy(pygame.sprite.Sprite):
                 self.image = image
             else:
                 self.image = image2
-        if not (5 <= int(self.cur_frame / 2) % 10 <= 9):
+        self.speed = 3 + game_difficult // 5
+        if not (3 <= int(self.cur_frame / (6 / (game_difficult // 5 + 3))) % 8 <= 6):
             vector_len = delta_vector.length()
             if vector_len > 0:
                 self.pos += delta_vector / vector_len * min(vector_len, self.speed)

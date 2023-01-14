@@ -2,10 +2,11 @@ import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, moving_objects_group, player_pos, pos):
+    def __init__(self, moving_objects_group, player, pos):
         super().__init__(moving_objects_group)
+        player_pos = player.rect
         self.speed = 20
-        self.damage = 10
+        self.damage = player.damage
         self.uses = 1
         self.pos = pygame.Vector2(player_pos.center[0], player_pos.center[1])
         self.delta_vector = pygame.Vector2(pos[0] - player_pos.center[0], pos[1] - player_pos.center[1])
