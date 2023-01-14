@@ -1,9 +1,12 @@
+import random
+
 import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, moving_objects_group, player, pos):
         super().__init__(moving_objects_group)
+        self.player = player
         player_pos = player.rect
         self.speed = 20
         self.damage = player.damage
@@ -29,5 +32,9 @@ class Bullet(pygame.sprite.Sprite):
                 if self.rect.colliderect(enemy.rect):
                     enemy.hit(self.damage)
                     self.uses -= 1
+                    if self.player.frozen:
+                        a = random.randint(1, 100)
+                        if a <= 50:
+                            enemy.frozen = True, enemy.cur_frame
                     if self.uses == 0:
                         self.kill()

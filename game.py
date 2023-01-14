@@ -5,7 +5,7 @@ import pygame
 from pygame.locals import *
 import math
 
-from player.level_system import Level, AbilityChoose
+from player.level_system import Level, AbilityChoose, ALL_ABILITIES
 from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     player_group = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
 
-    player = Player(screen, 10, 10, 30, 30, player_group, all_sprites)
+    player = Player(screen, 10, 5, 30, 30, player_group, all_sprites)
     level = Level(1, 1.5)
     camera = Camera(width, height)
     for y in range(-240, 641, 80):
@@ -77,13 +77,13 @@ if __name__ == '__main__':
             if pygame.sprite.spritecollideany(player_group.sprites()[0], orbs_group):
                 for orb in pygame.sprite.spritecollide(player_group.sprites()[0], orbs_group, False):
                     result = level.add_exp(orb.exp)
-
                     if result:
                         choose_ability = True
-                        choose_screen = AbilityChoose()
+                        choose_screen = AbilityChoose(player)
                         pygame.mixer.Sound("resourses/sounds/raising_the_level.mp3").play()
                     else:
                         pygame.mixer.Sound("resourses/sounds/gaining_experience_sound.mp3").play()
+                    show = 0
                     orb.kill()
             if frames % 60 == 0:
                 for _ in range(round(game_difficult)):
@@ -117,14 +117,22 @@ if __name__ == '__main__':
             pygame.display.flip()
             clock.tick(fps)
         else:
+            choose = False
             choose_screen.update(screen)
+            choose_screen.show_ability(screen, choose_screen.btns[show][0], show)
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     for i in range(3):
-                        if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in choose_screen.btns[i][1]:
-                            exec(choose_screen.btns[i][0][1])
-                            choose_ability = False
-                            move = (False, False, False, False)
-                            time.sleep(0.1)
+                        if not choose:
+                            if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in choose_screen.btns[i][1]:
+                                show = i
+                            if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in choose_screen.accept_btn_rect:
+                                exec(choose_screen.btns[show][0][1])
+                                if choose_screen.btns[show][0][0] in [elem for elem in ALL_ABILITIES.keys()]:
+                                    player.had.append(choose_screen.btns[show][0][0])
+                                choose = True
+                                choose_ability = False
+                                move = (False, False, False, False)
+                                time.sleep(0.05)
                 pygame.display.flip()
     terminate()

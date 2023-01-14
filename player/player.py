@@ -8,8 +8,10 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.player_x, self.player_y = x, y
         self.frames = []
+        self.had = []
         self.hp = [hp, hp]
         self.damage = damage
+        self.frozen = False
         self.speed = 5
         cut_sheet(self, load_image('resourses/sprites/player/player.png', -1), 6, 11)
         self.cur_frame = 0

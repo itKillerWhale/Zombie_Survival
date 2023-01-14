@@ -1,6 +1,9 @@
 import math
 import pygame
 
+FROZEN_ZOMBIE = pygame.image.load('resourses/sprites/zombie/Zombie_Frozen.png')
+FROZEN_ZOMBIE_REVERSE = pygame.transform.flip(FROZEN_ZOMBIE, True, False)
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, hp, x, y, image, enemy_group, all_sprites):
@@ -13,6 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         self.cur_frame = 0
 
         self.image = image
+        self.frozen = False, 0
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(x, y)
 
@@ -27,14 +31,21 @@ class Enemy(pygame.sprite.Sprite):
         self.cur_frame += 1
         delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
         if math.hypot(player_pos.x - self.rect.x, player_pos.y - self.rect.y) < 900:
-            if delta_vector.x > 0:
-                self.image = image
+            if self.frozen[0] and self.cur_frame - self.frozen[1] <= 60:
+                if delta_vector.x > 0:
+                    self.image = FROZEN_ZOMBIE
+                else:
+                    self.image = FROZEN_ZOMBIE_REVERSE
             else:
-                self.image = image2
+                self.frozen = False, 0
+                if delta_vector.x > 0:
+                    self.image = image
+                else:
+                    self.image = image2
         self.speed = 3 + game_difficult // 5
         if not (3 <= int(self.cur_frame / (6 / (game_difficult // 5 + 3))) % 8 <= 6):
             vector_len = delta_vector.length()
-            if vector_len > 0:
+            if vector_len > 0 and not self.frozen[0]:
                 self.pos += delta_vector / vector_len * min(vector_len, self.speed)
 
         self.rect.x, self.rect.y = self.pos.x, self.pos.y
