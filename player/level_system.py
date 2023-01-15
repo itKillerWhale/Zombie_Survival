@@ -19,6 +19,7 @@ class Level:
         self.total_exp = 0
         self.level_muptiplier = level_muptiplier
         self.level = 1
+        self.level_up = False
         self.level_progress = [0, first_lvl_need]
 
     def update(self, screen):
@@ -45,7 +46,7 @@ class Level:
             self.level += 1
             self.level_progress[1] *= self.level_muptiplier
             self.level_progress[1] = round(self.level_progress[1])
-        return True
+            self.level_up = True
 
 
 class AbilityChoose:

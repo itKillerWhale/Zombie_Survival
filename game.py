@@ -140,8 +140,9 @@ def game():
                     pygame.mixer.Sound("resourses/sounds/shoot.mp3").play()
             if pygame.sprite.spritecollideany(player_group.sprites()[0], orbs_group):
                 for orb in pygame.sprite.spritecollide(player_group.sprites()[0], orbs_group, False):
-                    result = level.add_exp(orb.exp)
-                    if result:
+                    level.add_exp(orb.exp)
+                    if level.level_up:
+                        level.level_up = False
                         choose_ability = True
                         choose_screen = AbilityChoose(player)
                         pygame.mixer.Sound("resourses/sounds/raising_the_level.mp3").play()
@@ -198,7 +199,7 @@ def game():
                                 choose = True
                                 choose_ability = False
                                 move = (False, False, False, False)
-                                time.sleep(0.05)
+                                time.sleep(0.15)
                 pygame.display.flip()
 
 
