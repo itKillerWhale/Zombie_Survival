@@ -1,4 +1,6 @@
 import math
+import random
+
 import pygame
 
 FROZEN_ZOMBIE = pygame.image.load('resourses/sprites/zombie/Zombie_Frozen.png')
@@ -52,6 +54,10 @@ class Enemy(pygame.sprite.Sprite):
 
         if self.hp <= 0:
             player.kills += 1
+            if player.vampirizm:
+                a = random.randint(1, 100)
+                if a <= 5 and player.hp[0] < player.hp[1]:
+                    player.hp[0] += 1
             self.kill()
             ExpOrb(1, (self.rect.centerx, self.rect.centery), orbs_group, all_sprites)
 

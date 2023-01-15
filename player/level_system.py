@@ -4,13 +4,17 @@ import pygame
 
 BUFFS = {'Увеличивает урон на 5%': 'player.damage += player.start_damage / 20',
          'Увеличивает урон на 10%': 'player.damage += player.start_damage / 10',
-         'Увеличивает урон на 15%': 'player.damage += player.start_damage / (100 / 15)'}
+         'Увеличивает урон на 15%': 'player.damage += player.start_damage / (100 / 15)',
+         'Пуля пробивает на 1 монстра больше': 'player.bullet_pierces += 1',
+         'Добавляет 1 пулю в магазин': 'player.magazin[1] += 1',
+         'Ускоряет перезарядку оружия на 20%': 'player.reload_speed -= player.reload_speed / 5',
+         'Увеличивает скорость стрельбы на 20%': 'player.fire_rate -= player.fire_rate / 5'}
 
-UNCOMMON_ABILITIES = {'С шансом 20% замораживает врага на 2 секунды': 'player.frozen = True, player.cur_frame'}
+ABILITIES = {'С шансом 20% замораживает врага на 2 секунды': 'player.frozen = True, player.cur_frame',
+             'Создаёт щит, блокирующий удар, раз в 2 минуты': 'player.shield = True, -3600',
+             'С шансом 5%, при убийстве, восстанавливает здоровье': 'player.vampirizm = True'}
 
-ABILITIES_CHANCES = [UNCOMMON_ABILITIES]
-
-ALL_ABILITIES = UNCOMMON_ABILITIES
+ABILITIES_CHANCES = [{}, ABILITIES]
 
 
 class Level:
@@ -64,10 +68,10 @@ class AbilityChoose:
 
     def update(self, screen):
         self.btns = []
-        all_buffs = BUFFS | UNCOMMON_ABILITIES
+        all_buffs = BUFFS | ABILITIES
         pygame.draw.rect(screen, '#1e3130', (390, 235, 500, 250), border_radius=20)
         pygame.draw.rect(screen, 'white', self.accept_btn_rect, border_radius=10)
-        font = pygame.font.SysFont('Comic Sans MS', 20)
+        font = pygame.font.SysFont('Comic Sans MS', 17)
         accept = font.render('Выбрать', True, 'black')
         screen.blit(accept, accept.get_rect(center=(640, 413)))
         for i in range(3):

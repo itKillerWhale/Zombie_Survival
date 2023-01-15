@@ -5,53 +5,76 @@ import pygame
 from pygame.locals import *
 import math
 
-from player.level_system import Level, AbilityChoose, ALL_ABILITIES
+from player.level_system import Level, AbilityChoose, ABILITIES
 from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
 from enemy.enemy import Enemy
 from world.world import Tile
-from functions import terminate
+from functions import terminate, load_image
 
 pygame.init()
 pygame.display.set_caption("project")
 size = width, height = 1280, 720
 FPS = 30
+results = dict()
 flags = DOUBLEBUF
 screen = pygame.display.set_mode(size, flags, 16)
 
 PATH = 'resourses/sprites/zombie/'
-ZOMBIE_WALK = [pygame.image.load(image).convert_alpha() for image in
+ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)) for image in
                [PATH + 'Zombie_Walk1.png', PATH + 'Zombie_Walk2.png', PATH + 'Zombie_Walk3.png',
                 PATH + 'Zombie_Walk4.png', PATH + 'Zombie_Walk5.png', PATH + 'Zombie_Walk6.png',
                 PATH + 'Zombie_Walk7.png', PATH + 'Zombie_Walk8.png']]
 
 ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) for image in ZOMBIE_WALK]
 SAND_IMAGE = pygame.image.load('resourses/sprites/world/sand.jpg').convert_alpha()
+BULLET_IMAGE = pygame.transform.scale(load_image('resourses/sprites/player/bullet.png', -1), (30, 15))
 
 
-def start_screen(screen, clock):
+def results_screen():
+    fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
+                                 (screen.get_width(), screen.get_height()))
+    screen.blit(fon, (0, 0))
+    pygame.draw.rect(screen, 'white', (50, 50, screen.get_width() - 100, screen.get_height() - 100), border_radius=30)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    start_screen()
+
+
+def start_screen():
     font = pygame.font.SysFont('Comic Sans MS', 30)
     start_screen_fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
                                               (screen.get_width(), screen.get_height()))
+    screen.blit(start_screen_fon, (0, 0))
 
     start_game_btn_rect = pygame.Rect(470, 320, 380, 50)
     start_game_btn = font.render('Играть', True, 'black')
-    screen.blit(start_screen_fon, (0, 0))
     pygame.draw.rect(screen, 'white', start_game_btn_rect, border_radius=20)
     screen.blit(start_game_btn, start_game_btn.get_rect(center=(660, 345)))
+
+    results_btn_rect = pygame.Rect(470, 380, 380, 50)
+    results_btn = font.render('Результаты', True, 'black')
+    pygame.draw.rect(screen, 'white', results_btn_rect, border_radius=20)
+    screen.blit(results_btn, results_btn.get_rect(center=(660, 405)))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in start_game_btn_rect:
-                    return
+                    game()
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in results_btn_rect:
+                    results_screen()
         pygame.display.flip()
         clock.tick(30)
 
 
-def end_game_screen(screen, all_sprites, player, level):
+def end_game_screen(all_sprites, player, level):
     all_sprites.draw(screen)
     player.update_hp_bar(screen)
     level.update(screen)
@@ -91,7 +114,41 @@ def end_game_screen(screen, all_sprites, player, level):
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
                     game()
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
-                    start_screen(screen, clock)
+                    start_screen()
+
+
+def pause_screen():
+    pygame.draw.rect(screen, '#1e3130', (490, 235, 300, 250), border_radius=20)
+    font = pygame.font.SysFont('Comic Sans MS', 20)
+
+    continue_btn_rect = pygame.Rect(540, 285, 200, 40)
+    pygame.draw.rect(screen, 'white', continue_btn_rect, border_radius=10)
+    continue_btn = font.render('Продолжить', True, 'black')
+    screen.blit(continue_btn, continue_btn.get_rect(center=(640, 300)))
+
+    restart_btn_rect = pygame.Rect(540, 345, 200, 40)
+    pygame.draw.rect(screen, 'white', restart_btn_rect, border_radius=10)
+    restart_btn = font.render('Играть заново', True, 'black')
+    screen.blit(restart_btn, restart_btn.get_rect(center=(640, 360)))
+
+    exit_btn_rect = pygame.Rect(540, 405, 200, 40)
+    pygame.draw.rect(screen, 'white', exit_btn_rect, border_radius=10)
+    exit_btn = font.render('Выйти в меню', True, 'black')
+    screen.blit(exit_btn, exit_btn.get_rect(center=(640, 420)))
+    pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in continue_btn_rect:
+                    time.sleep(0.15)
+                    return
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
+                    game()
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
+                    start_screen()
 
 
 def game():
@@ -101,6 +158,7 @@ def game():
 
     choose_ability = False
     running = True
+    pause = False
 
     tiles_group = pygame.sprite.Group()
     orbs_group = pygame.sprite.Group()
@@ -110,7 +168,7 @@ def game():
     all_sprites = pygame.sprite.Group()
 
     player = Player(screen, 1, 5, 30, 30, player_group, all_sprites)
-    level = Level(1, 1.5)
+    level = Level(4, 1.3)
     camera = Camera(width, height)
     for y in range(-240, 641, 80):
         for x in range(-240, 1201, 80):
@@ -125,16 +183,19 @@ def game():
                 running = False
             if not choose_ability:
                 if event.type == pygame.KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        pause_screen()
+                        continue
                     move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
                 if event.type == pygame.KEYUP:
                     move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
         if not choose_ability:
             screen.fill((0, 0, 0))
             if player.hp[0] <= 0:
-                end_game_screen(screen, all_sprites, player, level)
-            if pygame.mouse.get_pressed()[0] and frames - last_shot >= 900 / player.shot_speed:
+                end_game_screen(all_sprites, player, level)
+            if pygame.mouse.get_pressed()[0] and frames - last_shot >= player.fire_rate / player.shot_speed:
                 if player.magazin[0] > 0:
-                    Bullet(bullets_group, player, pygame.mouse.get_pos())
+                    Bullet(bullets_group, player, pygame.mouse.get_pos(), BULLET_IMAGE)
                     player.magazin[0] -= 1
                     last_shot = frames
                     pygame.mixer.Sound("resourses/sounds/shoot.mp3").play()
@@ -179,7 +240,7 @@ def game():
 
             frames += 1
             game_difficult += 1 / 1000
-            # print(game_difficult)
+            # print(clock.get_fps())
             pygame.display.flip()
             clock.tick(FPS)
         else:
@@ -194,7 +255,7 @@ def game():
                                 show = i
                             if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in choose_screen.accept_btn_rect:
                                 exec(choose_screen.btns[show][0][1])
-                                if choose_screen.btns[show][0][0] in [elem for elem in ALL_ABILITIES.keys()]:
+                                if choose_screen.btns[show][0][0] in [elem for elem in ABILITIES.keys()]:
                                     player.had.append(choose_screen.btns[show][0][0])
                                 choose = True
                                 choose_ability = False
@@ -208,7 +269,7 @@ if __name__ == '__main__':
     pygame.display.flip()
     screen.set_alpha(None)
     clock = pygame.time.Clock()
-    start_screen(screen, clock)
+    start_screen()
     game()
 
     terminate()
