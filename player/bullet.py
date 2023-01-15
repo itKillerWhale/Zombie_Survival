@@ -34,7 +34,7 @@ class Bullet(pygame.sprite.Sprite):
                     self.uses -= 1
                     if self.player.frozen:
                         a = random.randint(1, 100)
-                        if a <= 50:
+                        if a <= 20:
                             enemy.frozen = True, enemy.cur_frame
                     if self.uses == 0:
                         self.kill()

@@ -51,6 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
         if self.hp <= 0:
+            player.kills += 1
             self.kill()
             ExpOrb(1, (self.rect.centerx, self.rect.centery), orbs_group, all_sprites)
 

@@ -6,7 +6,7 @@ BUFFS = {'Увеличивает урон на 5%': 'player.damage += player.sta
          'Увеличивает урон на 10%': 'player.damage += player.start_damage / 10',
          'Увеличивает урон на 15%': 'player.damage += player.start_damage / (100 / 15)'}
 
-UNCOMMON_ABILITIES = {'С шансом 15% замораживает врага на 2 секунды': 'player.frozen = True, player.cur_frame'}
+UNCOMMON_ABILITIES = {'С шансом 20% замораживает врага на 2 секунды': 'player.frozen = True, player.cur_frame'}
 
 ABILITIES_CHANCES = [UNCOMMON_ABILITIES]
 
@@ -40,12 +40,12 @@ class Level:
 
     def add_exp(self, exp):
         self.level_progress[0] += exp
-        if self.level_progress[0] >= self.level_progress[1]:
+        while self.level_progress[0] >= self.level_progress[1]:
             self.level_progress[0] -= self.level_progress[1]
             self.level += 1
             self.level_progress[1] *= self.level_muptiplier
             self.level_progress[1] = round(self.level_progress[1])
-            return True
+        return True
 
 
 class AbilityChoose:

@@ -16,6 +16,7 @@ from functions import terminate
 pygame.init()
 pygame.display.set_caption("project")
 size = width, height = 1280, 720
+FPS = 30
 flags = DOUBLEBUF
 screen = pygame.display.set_mode(size, flags, 16)
 
@@ -28,19 +29,78 @@ ZOMBIE_WALK = [pygame.image.load(image).convert_alpha() for image in
 ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) for image in ZOMBIE_WALK]
 SAND_IMAGE = pygame.image.load('resourses/sprites/world/sand.jpg').convert_alpha()
 
-if __name__ == '__main__':
-    running = True
-    fps = 30
-    screen.fill(pygame.Color("black"))
-    pygame.display.flip()
-    screen.set_alpha(None)
-    clock = pygame.time.Clock()
 
+def start_screen(screen, clock):
+    font = pygame.font.SysFont('Comic Sans MS', 30)
+    start_screen_fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
+                                              (screen.get_width(), screen.get_height()))
+
+    start_game_btn_rect = pygame.Rect(470, 320, 380, 50)
+    start_game_btn = font.render('Играть', True, 'black')
+    screen.blit(start_screen_fon, (0, 0))
+    pygame.draw.rect(screen, 'white', start_game_btn_rect, border_radius=20)
+    screen.blit(start_game_btn, start_game_btn.get_rect(center=(660, 345)))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in start_game_btn_rect:
+                    return
+        pygame.display.flip()
+        clock.tick(30)
+
+
+def end_game_screen(screen, all_sprites, player, level):
+    all_sprites.draw(screen)
+    player.update_hp_bar(screen)
+    level.update(screen)
+    font = pygame.font.SysFont('Comic Sans MS', 20)
+
+    pygame.draw.rect(screen, '#1e3130', (390, 235, 500, 250), border_radius=20)
+
+    restart_btn_rect = pygame.Rect(420, 420, 200, 30)
+    pygame.draw.rect(screen, 'white', restart_btn_rect, border_radius=10)
+    restart = font.render('Играть заново', True, 'black')
+    screen.blit(restart, restart.get_rect(center=(520, 433)))
+
+    exit_btn_rect = pygame.Rect(660, 420, 200, 30)
+    pygame.draw.rect(screen, 'white', exit_btn_rect, border_radius=10)
+    exit = font.render('Выйти в меню', True, 'black')
+    screen.blit(exit, exit.get_rect(center=(760, 433)))
+
+    font = pygame.font.SysFont('Comic Sans MS', 20)
+
+    kills_count = font.render(f'Количество убийств: {player.kills}', True, 'white')
+    screen.blit(kills_count, (420, 263))
+
+    max_level = font.render(
+        f'Достигнутый уровень: {level.level}', True,
+        'white')
+    screen.blit(max_level, (420, 313))
+    max_level_exp = font.render(
+        f'({level.level_progress[0]} из {level.level_progress[1]} опыта)', True, 'white')
+    screen.blit(max_level_exp, (420, 333))
+
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
+                    game()
+                if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
+                    start_screen(screen, clock)
+
+
+def game():
     frames = 0
     last_shot = 0
     game_difficult = 3
 
     choose_ability = False
+    running = True
 
     tiles_group = pygame.sprite.Group()
     orbs_group = pygame.sprite.Group()
@@ -49,7 +109,7 @@ if __name__ == '__main__':
     player_group = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
 
-    player = Player(screen, 10, 5, 30, 30, player_group, all_sprites)
+    player = Player(screen, 1, 5, 30, 30, player_group, all_sprites)
     level = Level(1, 1.5)
     camera = Camera(width, height)
     for y in range(-240, 641, 80):
@@ -70,10 +130,14 @@ if __name__ == '__main__':
                     move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
         if not choose_ability:
             screen.fill((0, 0, 0))
+            if player.hp[0] <= 0:
+                end_game_screen(screen, all_sprites, player, level)
             if pygame.mouse.get_pressed()[0] and frames - last_shot >= 900 / player.shot_speed:
-                Bullet(bullets_group, player, pygame.mouse.get_pos())
-                last_shot = frames
-                pygame.mixer.Sound("resourses/sounds/shoot.mp3").play()
+                if player.magazin[0] > 0:
+                    Bullet(bullets_group, player, pygame.mouse.get_pos())
+                    player.magazin[0] -= 1
+                    last_shot = frames
+                    pygame.mixer.Sound("resourses/sounds/shoot.mp3").play()
             if pygame.sprite.spritecollideany(player_group.sprites()[0], orbs_group):
                 for orb in pygame.sprite.spritecollide(player_group.sprites()[0], orbs_group, False):
                     result = level.add_exp(orb.exp)
@@ -93,7 +157,8 @@ if __name__ == '__main__':
 
             left, right, up, down = move
             player_group.update(screen, left, right, up, down, enemy_group)
-            enemy_group.update(player, game_difficult, ZOMBIE_WALK[(frames // 2) % 8], ZOMBIE_WALK_REVERSE[(frames // 2) % 8],
+            enemy_group.update(player, game_difficult, ZOMBIE_WALK[(frames // 2) % 8],
+                               ZOMBIE_WALK_REVERSE[(frames // 2) % 8],
                                orbs_group, enemy_group, all_sprites)
             bullets_group.update(enemy_group)
 
@@ -115,7 +180,7 @@ if __name__ == '__main__':
             game_difficult += 1 / 1000
             # print(game_difficult)
             pygame.display.flip()
-            clock.tick(fps)
+            clock.tick(FPS)
         else:
             choose = False
             choose_screen.update(screen)
@@ -135,4 +200,14 @@ if __name__ == '__main__':
                                 move = (False, False, False, False)
                                 time.sleep(0.05)
                 pygame.display.flip()
+
+
+if __name__ == '__main__':
+    screen.fill(pygame.Color("black"))
+    pygame.display.flip()
+    screen.set_alpha(None)
+    clock = pygame.time.Clock()
+    start_screen(screen, clock)
+    game()
+
     terminate()

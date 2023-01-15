@@ -13,9 +13,13 @@ class Player(pygame.sprite.Sprite):
         self.damage = damage
         self.frozen = False
         self.speed = 5
+        self.reload_speed = 90
+        self.magazin = [6, 6]
         cut_sheet(self, load_image('resourses/sprites/player/player.png', -1), 6, 11)
         self.cur_frame = 0
         self.last_hit = 0
+        self.reload = 0, False
+        self.kills = 0
         self.start_damage = self.damage
         self.start_speed = self.speed
         self.percentage = self.hp[0] / self.hp[1]
@@ -40,10 +44,16 @@ class Player(pygame.sprite.Sprite):
         screen.blit(hp, hp_rect)
 
     def update(self, screen, left, right, up, down, enemy_group):
+        if self.magazin[0] <= 0 and not self.reload[1]:
+            self.reload = self.cur_frame, True
+        if self.reload[1] and self.cur_frame - self.reload[0] > self.reload_speed:
+            self.magazin[0] = self.magazin[1]
+            self.reload = 0, False
         if self.cur_frame - self.last_hit > 30:
-            if pygame.sprite.spritecollideany(self, enemy_group):
-                self.hp[0] -= 1
-                pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
+            for enemy in pygame.sprite.spritecollide(self, enemy_group, False):
+                if pygame.sprite.collide_mask(self, enemy):
+                    self.hp[0] -= 1
+                    pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
             self.last_hit = self.cur_frame
             try:
                 self.percentage = self.hp[0] / self.hp[1]
@@ -62,3 +72,4 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += self.speed
             self.player_y += self.speed
         self.cur_frame += 1
+
