@@ -79,7 +79,10 @@ class Player(pygame.sprite.Sprite):
                         self.shield = True, self.cur_frame
                         break
                     self.hp[0] -= 1
-                    pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
+                    if self.hp[0] == 0:
+                        pygame.mixer.Sound("resourses/sounds/game_over.mp3").play()
+                    else:
+                        pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
             self.last_hit = self.cur_frame
             try:
                 self.percentage = self.hp[0] / self.hp[1]
