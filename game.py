@@ -17,8 +17,8 @@ from functions import terminate, load_image
 pygame.init()
 pygame.display.set_caption("Survive The Apocalypse")
 size = width, height = 1280, 720
-FPS = 30
 flags = DOUBLEBUF
+FPS = 30
 screen = pygame.display.set_mode(size, flags, 16)
 
 PATH = 'resourses/sprites/zombie/'
