@@ -64,6 +64,8 @@ def results_screen():
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     start_screen()
@@ -165,6 +167,10 @@ def pause_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    time.sleep(0.15)
+                    return
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in continue_btn_rect:
                     time.sleep(0.15)
@@ -204,7 +210,7 @@ def game():
         for event in pygame.event.get():
             keys = pygame.key.get_pressed()
             if event.type == pygame.QUIT:
-                running = False
+                terminate()
             if not choose_ability:
                 if event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
@@ -214,6 +220,7 @@ def game():
                 if event.type == pygame.KEYUP:
                     move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
         if not choose_ability:
+            mouse_btn = pygame.mouse.get_pressed()[0]
             screen.fill((0, 0, 0))
             if player.hp[0] <= 0:
                 with open('results.txt', encoding='UTF-8', mode='a') as f:
@@ -266,7 +273,7 @@ def game():
             player.update_hp_bar(screen)
 
             frames += 1
-            game_difficult += 1 / 1000
+            game_difficult += 1 / 2000
             # print(clock.get_fps())
             pygame.display.flip()
             clock.tick(FPS)
