@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 BUFFS = {'Увеличивает урон на 5%': 'player.damage += player.start_damage / 20',
@@ -7,8 +6,8 @@ BUFFS = {'Увеличивает урон на 5%': 'player.damage += player.sta
          'Увеличивает урон на 15%': 'player.damage += player.start_damage / (100 / 15)',
          'Пуля пробивает на 1 монстра больше': 'player.bullet_pierces += 1',
          'Добавляет 1 пулю в магазин': 'player.magazin[1] += 1',
-         'Ускоряет перезарядку оружия на 20%': 'player.reload_speed -= player.reload_speed / 5',
-         'Увеличивает скорость стрельбы на 20%': 'player.fire_rate -= player.fire_rate / 5'}
+         'Ускоряет перезарядку оружия на 15%': 'player.reload_speed -= player.reload_speed / (100 / 15)',
+         'Увеличивает скорость стрельбы на 15%': 'player.fire_rate -= player.fire_rate / (100 / 15)'}
 
 ABILITIES = {'С шансом 20% замораживает врага на 2 секунды': 'player.frozen = True, player.cur_frame',
              'Создаёт щит, блокирующий удар, раз в 2 минуты': 'player.shield = True, -3600',
@@ -83,7 +82,7 @@ class AbilityChoose:
             self.btns.append((ability, ability_rect))
 
     def show_ability(self, screen, ability, show):
-        font = pygame.font.SysFont('Comic Sans MS', 20)
+        font = pygame.font.SysFont('Comic Sans MS', 17)
         ability_text = font.render(ability[0], True, 'white')
         ability_text_rect = ability_text.get_rect(center=(640, 340))
         pygame.draw.rect(screen, 'white', (480 + 135 * show, 250, 40, 40), border_radius=20, width=2)

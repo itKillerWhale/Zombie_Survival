@@ -58,6 +58,7 @@ class Enemy(pygame.sprite.Sprite):
                 a = random.randint(1, 100)
                 if a <= 5 and player.hp[0] < player.hp[1]:
                     player.hp[0] += 1
+            enemy_group.remove(self)
             self.kill()
             ExpOrb(1, (self.rect.centerx, self.rect.centery), orbs_group, all_sprites)
 

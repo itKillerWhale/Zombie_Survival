@@ -143,7 +143,7 @@ def end_game_screen(all_sprites, player, level):
                     start_screen()
 
 
-def pause_screen():
+def pause_screen(player, level):
     pygame.draw.rect(screen, '#1e3130', (490, 235, 300, 250), border_radius=20)
     font = pygame.font.SysFont('Comic Sans MS', 20)
 
@@ -176,8 +176,16 @@ def pause_screen():
                     time.sleep(0.15)
                     return
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
+                    with open('results.txt', encoding='UTF-8', mode='a') as f:
+                        f.write(
+                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
+                            f' {player.kills}')
                     game()
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
+                    with open('results.txt', encoding='UTF-8', mode='a') as f:
+                        f.write(
+                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
+                            f' {player.kills}')
                     start_screen()
 
 
@@ -214,7 +222,7 @@ def game():
             if not choose_ability:
                 if event.type == pygame.KEYDOWN:
                     if event.key == K_ESCAPE:
-                        pause_screen()
+                        pause_screen(player, level)
                         continue
                     move = (keys[pygame.K_a], keys[pygame.K_d], keys[pygame.K_w], keys[pygame.K_s])
                 if event.type == pygame.KEYUP:
@@ -245,8 +253,11 @@ def game():
                         pygame.mixer.Sound("resourses/sounds/gaining_experience_sound.mp3").play()
                     show = 0
                     orb.kill()
-            if frames % 60 == 0:
+            if frames % 120 == 0:
+                print(len(enemy_group))
                 for _ in range(round(game_difficult)):
+                    if len(enemy_group) >= 60:
+                        enemy_group.remove(enemy_group.sprites()[-1])
                     angle = math.radians(random.randint(0, 360))
                     x, y = math.cos(angle) * 880 + player.rect.x, math.sin(angle) * 600 + player.rect.y
                     Enemy(10, x, y, ZOMBIE_WALK[0], enemy_group, all_sprites)
