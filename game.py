@@ -1,3 +1,4 @@
+import os
 import random
 import time
 
@@ -11,7 +12,7 @@ from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
 from enemy.enemy import Enemy
-from world.world import Tile
+from world.world import Tile, OtherObjects
 from functions import terminate, load_image
 
 pygame.init()
@@ -22,14 +23,17 @@ FPS = 30
 screen = pygame.display.set_mode(size, flags, 16)
 
 PATH = 'resourses/sprites/zombie/'
-ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)) for image in
+ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)).convert_alpha() for image in
                [PATH + 'Zombie_Walk1.png', PATH + 'Zombie_Walk2.png', PATH + 'Zombie_Walk3.png',
                 PATH + 'Zombie_Walk4.png', PATH + 'Zombie_Walk5.png', PATH + 'Zombie_Walk6.png',
                 PATH + 'Zombie_Walk7.png', PATH + 'Zombie_Walk8.png']]
 
-ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) for image in ZOMBIE_WALK]
+ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) .convert_alpha()for image in ZOMBIE_WALK]
 SAND_IMAGE = pygame.image.load('resourses/sprites/world/sand.jpg').convert_alpha()
 BULLET_IMAGE = pygame.transform.scale(load_image('resourses/sprites/player/bullet.png', -1), (30, 15))
+PATH = 'resourses/sprites/world/'
+OTHER_OBJECTS_IMAGE = [pygame.transform.scale(pygame.image.load(image), (60, 60)) for image in
+                       [PATH + file for file in os.listdir('resourses/sprites/world')]]
 
 
 def results_screen():
@@ -196,9 +200,9 @@ def game():
 
     choose_ability = False
     running = True
-    pause = False
 
     tiles_group = pygame.sprite.Group()
+    other_objects_group = pygame.sprite.Group()
     orbs_group = pygame.sprite.Group()
     enemy_group = pygame.sprite.Group()
     bullets_group = pygame.sprite.Group()
@@ -254,28 +258,29 @@ def game():
                     show = 0
                     orb.kill()
             if frames % 120 == 0:
-                print(len(enemy_group))
                 for _ in range(round(game_difficult)):
                     if len(enemy_group) >= 60:
-                        enemy_group.remove(enemy_group.sprites()[-1])
+                        enemy_group.remove(enemy_group.sprites()[0])
                     angle = math.radians(random.randint(0, 360))
                     x, y = math.cos(angle) * 880 + player.rect.x, math.sin(angle) * 600 + player.rect.y
                     Enemy(10, x, y, ZOMBIE_WALK[0], enemy_group, all_sprites)
 
             left, right, up, down = move
-            player_group.update(screen, left, right, up, down, enemy_group)
+            player_group.update(screen, left, right, up, down, enemy_group, other_objects_group)
             enemy_group.update(player, game_difficult, ZOMBIE_WALK[(frames // 2) % 8],
                                ZOMBIE_WALK_REVERSE[(frames // 2) % 8],
-                               orbs_group, enemy_group, all_sprites)
+                               orbs_group, enemy_group, other_objects_group, all_sprites)
             bullets_group.update(enemy_group)
 
             camera.update(player)
             for sprite in all_sprites:
                 camera.apply(sprite)
 
-            tiles_group.update(player.rect)
+            tiles_group.update(player.rect, OTHER_OBJECTS_IMAGE, other_objects_group)
+            other_objects_group.update(player, other_objects_group, all_sprites)
 
             tiles_group.draw(screen)
+            other_objects_group.draw(screen)
             orbs_group.draw(screen)
             bullets_group.draw(screen)
             player_group.draw(screen)

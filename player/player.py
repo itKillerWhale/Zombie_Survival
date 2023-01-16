@@ -1,3 +1,5 @@
+import copy
+
 import pygame
 
 from functions import load_image, cut_sheet
@@ -56,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         magazin = font.render(f'Патроны: {self.magazin[0]}/{self.magazin[1]}', True, 'white')
         screen.blit(magazin, (80, 75))
 
-    def update(self, screen, left, right, up, down, enemy_group):
+    def update(self, screen, left, right, up, down, enemy_group, other_objects_group):
         if right:
             self.image = self.frames[24 + (self.cur_frame // 2) % 6]
         elif left:
@@ -89,15 +91,34 @@ class Player(pygame.sprite.Sprite):
             except ZeroDivisionError:
                 self.percentage = 0
         if left:
+            old_rect = copy.deepcopy(self.rect)
             self.rect.x += -self.speed
             self.player_x += -self.speed
+            if self.check(other_objects_group):
+                self.rect = old_rect
         if right:
+            old_rect = copy.deepcopy(self.rect)
             self.rect.x += self.speed
             self.player_x += self.speed
+            if self.check(other_objects_group):
+                self.rect = old_rect
         if up:
+            old_rect = copy.deepcopy(self.rect)
             self.rect.y += -self.speed
             self.player_y += -self.speed
+            if self.check(other_objects_group):
+                self.rect = old_rect
         if down:
+            old_rect = copy.deepcopy(self.rect)
             self.rect.y += self.speed
             self.player_y += self.speed
+            if self.check(other_objects_group):
+                self.rect = old_rect
+
         self.cur_frame += 1
+
+    def check(self, other_objects_group):
+        for tile in other_objects_group:
+            if pygame.sprite.collide_mask(self, tile):
+                return True
+        return False

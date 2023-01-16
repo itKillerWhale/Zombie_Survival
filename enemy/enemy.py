@@ -1,3 +1,4 @@
+import copy
 import math
 import random
 
@@ -16,6 +17,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.speed = 3
         self.cur_frame = 0
+        self.collide = None
 
         self.image = image
         self.frozen = False, 0
@@ -28,7 +30,7 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.x += dx
         self.pos.y += dy
 
-    def update(self, player, game_difficult, image, image2, orbs_group, enemy_group, all_sprites):
+    def update(self, player, game_difficult, image, image2, orbs_group, enemy_group, other_objects_group, all_sprites):
         player_pos = player.rect
         self.cur_frame += 1
         delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
@@ -47,9 +49,14 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = 3 + game_difficult // 5
         if not (3 <= int(self.cur_frame / (6 / (game_difficult // 5 + 3))) % 8 <= 6):
             vector_len = delta_vector.length()
+            old_rect = copy.deepcopy(self.rect)
+            old_pos = copy.deepcopy(self.pos)
             if vector_len > 0 and not self.frozen[0]:
                 self.pos += delta_vector / vector_len * min(vector_len, self.speed)
-
+                self.rect.x, self.rect.y = self.pos.x, self.pos.y
+                if self.check(other_objects_group):
+                    self.rect = old_rect
+                    self.pos = old_pos
         self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
         if self.hp <= 0:
@@ -70,14 +77,32 @@ class Enemy(pygame.sprite.Sprite):
                     delta_vector = pygame.Vector2(enemy_pos.center[0] - self.rect.centerx,
                                                   enemy_pos.center[1] - self.rect.centery)
                     vector_len = delta_vector.length()
-
                     if vector_len > 0:
                         self.pos -= delta_vector / vector_len * min(vector_len, self.speed)
 
-                        self.rect.x, self.rect.y = self.pos.x, self.pos.y
+        if self.collide is not None:
+            if math.hypot(self.collide.rect.centerx - player.rect.centerx,
+                          self.collide.rect.centery - player.rect.centery) - math.hypot(
+                    self.rect.centerx - player.rect.centerx, self.rect.centery - player.rect.centery) <= 0:
+                delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
+                vector_len = delta_vector.length()
+                self.pos -= delta_vector.rotate(90) / vector_len * min(vector_len, self.speed)
+            else:
+                delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
+                vector_len = delta_vector.length()
+                self.pos -= delta_vector / vector_len * min(vector_len, self.speed) * 2
+        self.collide = None
+        self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
     def hit(self, damage):
         self.hp -= damage
+
+    def check(self, other_objects_group):
+        for tile in other_objects_group:
+            if pygame.sprite.collide_mask(self, tile):
+                self.collide = tile
+                return True
+        return False
 
 
 class ExpOrb(pygame.sprite.Sprite):
