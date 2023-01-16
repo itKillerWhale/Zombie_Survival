@@ -72,7 +72,8 @@ class Player(pygame.sprite.Sprite):
         if self.reload[1] and self.cur_frame - self.reload[0] > self.reload_speed:
             self.magazin[0] = self.magazin[1]
             self.reload = 0, False
-        if self.cur_frame - self.last_hit > 30 and self.cur_frame - self.shield[1] > 90:
+        if self.cur_frame - self.last_hit > 20 and self.cur_frame - self.shield[1] > 90:
+            self.last_hit = self.cur_frame
             for enemy in pygame.sprite.spritecollide(self, enemy_group, False):
                 if pygame.sprite.collide_mask(self, enemy):
                     if self.shield[0] and self.cur_frame - self.shield[1] > 3600:
@@ -83,7 +84,6 @@ class Player(pygame.sprite.Sprite):
                         pygame.mixer.Sound("resourses/sounds/game_over.mp3").play()
                     else:
                         pygame.mixer.Sound("resourses/sounds/damage_sound.mp3").play()
-            self.last_hit = self.cur_frame
             try:
                 self.percentage = self.hp[0] / self.hp[1]
             except ZeroDivisionError:

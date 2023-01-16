@@ -3,6 +3,7 @@ import time
 
 import pygame
 from pygame.locals import *
+from datetime import datetime
 import math
 
 from player.level_system import Level, AbilityChoose, ABILITIES
@@ -14,10 +15,9 @@ from world.world import Tile
 from functions import terminate, load_image
 
 pygame.init()
-pygame.display.set_caption("project")
+pygame.display.set_caption("Survive The Apocalypse")
 size = width, height = 1280, 720
 FPS = 30
-results = dict()
 flags = DOUBLEBUF
 screen = pygame.display.set_mode(size, flags, 16)
 
@@ -33,10 +33,34 @@ BULLET_IMAGE = pygame.transform.scale(load_image('resourses/sprites/player/bulle
 
 
 def results_screen():
+    results = []
+    with open('results.txt', encoding='UTF-8') as file:
+        for line in file.readlines():
+            results.append(line.replace('\n', '').split(', '))
     fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
                                  (screen.get_width(), screen.get_height()))
     screen.blit(fon, (0, 0))
     pygame.draw.rect(screen, 'white', (50, 50, screen.get_width() - 100, screen.get_height() - 100), border_radius=30)
+    for i in range(1, 3):
+        pygame.draw.line(screen, 'black', (i * 420, 70), (i * 420, screen.get_height() - 70), width=5)
+    for i in range(1, 13):
+        pygame.draw.line(screen, 'black', (70, 70 + 45 * i), (screen.get_width() - 70, 70 + 45 * i), width=5)
+    for row, elem in enumerate(results[:11]):
+        if row == 0:
+            font = pygame.font.SysFont('Comic Sans MS', 30)
+        else:
+            font = pygame.font.SysFont('Comic Sans MS', 25)
+        alive_time = font.render(elem[0], True, 'black')
+        alive_time_rect = alive_time.get_rect(center=(245, 90 + row * 45))
+        screen.blit(alive_time, alive_time_rect)
+
+        level = font.render(elem[1], True, 'black')
+        level_rect = level.get_rect(center=(625, 90 + row * 45))
+        screen.blit(level, level_rect)
+
+        kills = font.render(elem[2], True, 'black')
+        kills_rect = kills.get_rect(center=(1005, 90 + row * 45))
+        screen.blit(kills, kills_rect)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -167,7 +191,7 @@ def game():
     player_group = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
 
-    player = Player(screen, 1, 5, 30, 30, player_group, all_sprites)
+    player = Player(screen, 10, 5, 30, 30, player_group, all_sprites)
     level = Level(4, 1.3)
     camera = Camera(width, height)
     for y in range(-240, 641, 80):
@@ -192,6 +216,9 @@ def game():
         if not choose_ability:
             screen.fill((0, 0, 0))
             if player.hp[0] <= 0:
+                with open('results.txt', encoding='UTF-8', mode='a') as f:
+                    f.write(f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
+                            f' {player.kills}')
                 end_game_screen(all_sprites, player, level)
             if pygame.mouse.get_pressed()[0] and frames - last_shot >= player.fire_rate / player.shot_speed:
                 if player.magazin[0] > 0:
