@@ -1,3 +1,4 @@
+import math
 import random
 import pygame
 
@@ -20,12 +21,16 @@ class Bullet(pygame.sprite.Sprite):
             self.pos += self.delta_vector / self.vector_len * self.speed
         local_vector = self.delta_vector / self.vector_len * self.speed
         self.image = pygame.transform.rotate(self.image, local_vector.angle_to(self.main_vector))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.pos.x, self.pos.y
 
-    def update(self, enemy_group):
-        if self.rect.x >= 1500 or self.rect.y >= 1000:  # Через какое кол-во пикселей удаляется пуля
+    def update(self, enemy_group, other_objetcs_group):
+        if math.hypot(self.rect.x - self.player.rect.x, self.rect.y - self.player.rect.y) >= 1000:
             self.kill()
+        for other_object in other_objetcs_group:
+            if pygame.sprite.collide_mask(self, other_object):
+                self.kill()
         else:
             self.pos += self.delta_vector / self.vector_len * self.speed
             self.rect.x, self.rect.y = self.pos.x, self.pos.y

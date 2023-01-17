@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import sqlite3
 
 import pygame
 from pygame.locals import *
@@ -12,7 +13,7 @@ from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
 from enemy.enemy import Enemy
-from world.world import Tile, OtherObjects
+from world.world import Tile
 from functions import terminate, load_image
 
 pygame.init()
@@ -28,7 +29,7 @@ ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)).conver
                 PATH + 'Zombie_Walk4.png', PATH + 'Zombie_Walk5.png', PATH + 'Zombie_Walk6.png',
                 PATH + 'Zombie_Walk7.png', PATH + 'Zombie_Walk8.png']]
 
-ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) .convert_alpha()for image in ZOMBIE_WALK]
+ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True).convert_alpha() for image in ZOMBIE_WALK]
 SAND_IMAGE = pygame.image.load('resourses/sprites/world/sand.jpg').convert_alpha()
 BULLET_IMAGE = pygame.transform.scale(load_image('resourses/sprites/player/bullet.png', -1), (30, 15))
 PATH = 'resourses/sprites/world/'
@@ -37,10 +38,11 @@ OTHER_OBJECTS_IMAGE = [pygame.transform.scale(pygame.image.load(image), (60, 60)
 
 
 def results_screen():
-    results = []
-    with open('results.txt', encoding='UTF-8') as file:
-        for line in file.readlines():
-            results.append(line.replace('\n', '').split(', '))
+    results = [('Дата и время', 'Достигнутый уровень', 'Количество убийств')]
+    database = sqlite3.connect('game_results.db')
+    cursor = database.cursor()
+    results += cursor.execute('SELECT * FROM results').fetchall()
+    database.close()
     fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
                                  (screen.get_width(), screen.get_height()))
     screen.blit(fon, (0, 0))
@@ -180,17 +182,25 @@ def pause_screen(player, level):
                     time.sleep(0.15)
                     return
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
-                    with open('results.txt', encoding='UTF-8', mode='a') as f:
-                        f.write(
-                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
-                            f' {player.kills}')
+                    out = (
+                        str(datetime.today()), f'{level.level} ({level.level_progress[0]}/{level.level_progress[1]})',
+                        str(player.kills))
+                    insert_data_in_database('game_results.db', out)
                     game()
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
-                    with open('results.txt', encoding='UTF-8', mode='a') as f:
-                        f.write(
-                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
-                            f' {player.kills}')
+                    out = (
+                        str(datetime.today()), f'{level.level} ({level.level_progress[0]}/{level.level_progress[1]})',
+                        str(player.kills))
+                    insert_data_in_database('game_results.db', out)
                     start_screen()
+
+
+def insert_data_in_database(database_name, data):
+    database = sqlite3.connect(database_name)
+    cursor = database.cursor()
+    cursor.execute('INSERT INTO Results values (?,?,?)', data)
+    database.commit()
+    database.close()
 
 
 def game():
@@ -235,9 +245,9 @@ def game():
             mouse_btn = pygame.mouse.get_pressed()[0]
             screen.fill((0, 0, 0))
             if player.hp[0] <= 0:
-                with open('results.txt', encoding='UTF-8', mode='a') as f:
-                    f.write(f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
-                            f' {player.kills}')
+                out = (str(datetime.today()), f'{level.level} ({level.level_progress[0]}/{level.level_progress[1]})',
+                       str(player.kills))
+                insert_data_in_database('game_results.db', out)
                 end_game_screen(all_sprites, player, level)
             if pygame.mouse.get_pressed()[0] and frames - last_shot >= player.fire_rate / player.shot_speed:
                 if player.magazin[0] > 0:
@@ -270,7 +280,7 @@ def game():
             enemy_group.update(player, game_difficult, ZOMBIE_WALK[(frames // 2) % 8],
                                ZOMBIE_WALK_REVERSE[(frames // 2) % 8],
                                orbs_group, enemy_group, other_objects_group, all_sprites)
-            bullets_group.update(enemy_group)
+            bullets_group.update(enemy_group, other_objects_group)
 
             camera.update(player)
             for sprite in all_sprites:
