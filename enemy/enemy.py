@@ -8,6 +8,7 @@ FROZEN_ZOMBIE = pygame.image.load('resourses/sprites/zombie/Zombie_Frozen.png')
 FROZEN_ZOMBIE_REVERSE = pygame.transform.flip(FROZEN_ZOMBIE, True, False)
 
 
+# Класс для создания монстров
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, hp, x, y, image, enemy_group, all_sprites):
         super().__init__(enemy_group, all_sprites)
@@ -26,6 +27,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.pos = pygame.Vector2(x, y)
 
+    # Функция для смещения объекта
     def apply_changes(self, dx, dy):
         self.pos.x += dx
         self.pos.y += dy
@@ -83,7 +85,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.collide is not None:
             if math.hypot(self.collide.rect.centerx - player.rect.centerx,
                           self.collide.rect.centery - player.rect.centery) - math.hypot(
-                    self.rect.centerx - player.rect.centerx, self.rect.centery - player.rect.centery) <= 0:
+                self.rect.centerx - player.rect.centerx, self.rect.centery - player.rect.centery) <= 0:
                 delta_vector = pygame.Vector2(player_pos.center[0] - 10, player_pos.center[1] + 10) - self.pos
                 vector_len = delta_vector.length()
                 self.pos -= delta_vector.rotate(90) / vector_len * min(vector_len, self.speed)
