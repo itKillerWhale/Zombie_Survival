@@ -15,6 +15,7 @@ from enemy.enemy import Enemy
 from world.world import Tile, OtherObjects
 from functions import terminate, load_image
 
+#  Инициализация окна
 pygame.init()
 pygame.display.set_caption("Survive The Apocalypse")
 size = width, height = 1280, 720
@@ -22,6 +23,7 @@ flags = DOUBLEBUF
 FPS = 30
 screen = pygame.display.set_mode(size, flags, 16)
 
+#  Загрузка изображений
 PATH = 'resourses/sprites/zombie/'
 ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)).convert_alpha() for image in
                [PATH + 'Zombie_Walk1.png', PATH + 'Zombie_Walk2.png', PATH + 'Zombie_Walk3.png',
@@ -36,6 +38,7 @@ OTHER_OBJECTS_IMAGE = [pygame.transform.scale(pygame.image.load(image), (60, 60)
                        [PATH + file for file in os.listdir('resourses/sprites/world')]]
 
 
+#  Окно результатов
 def results_screen():
     results = []
     with open('results.txt', encoding='UTF-8') as file:
@@ -75,6 +78,7 @@ def results_screen():
                     start_screen()
 
 
+#  Инициализация стартового окна
 def start_screen():
     font = pygame.font.SysFont('Comic Sans MS', 30)
     start_screen_fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
@@ -103,7 +107,7 @@ def start_screen():
         pygame.display.flip()
         clock.tick(30)
 
-
+#  Инициализация окна проигрыша
 def end_game_screen(all_sprites, player, level):
     all_sprites.draw(screen)
     player.update_hp_bar(screen)
@@ -147,6 +151,7 @@ def end_game_screen(all_sprites, player, level):
                     start_screen()
 
 
+#  Окно паузы
 def pause_screen(player, level):
     pygame.draw.rect(screen, '#1e3130', (490, 235, 300, 250), border_radius=20)
     font = pygame.font.SysFont('Comic Sans MS', 20)
@@ -192,7 +197,7 @@ def pause_screen(player, level):
                             f' {player.kills}')
                     start_screen()
 
-
+#  Основная функция игры 
 def game():
     frames = 0
     last_shot = 0
