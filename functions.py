@@ -2,12 +2,12 @@ import os
 import sys
 import pygame
 
-
+#  Функция для выхода из приложения 
 def terminate():
     pygame.quit()
     sys.exit()
 
-
+#  Функция для загрузки изображений 
 def load_image(name, colorkey=None):
     fullname = os.path.join(name)
     if not os.path.isfile(fullname):
@@ -24,6 +24,7 @@ def load_image(name, colorkey=None):
     return image
 
 
+#  Функция для разрезания изображения на несколько частей 
 def cut_sheet(self, sheet, columns, rows):
     self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                             sheet.get_height() // rows)

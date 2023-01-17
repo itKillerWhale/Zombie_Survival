@@ -13,9 +13,10 @@ from player.player import Player
 from player.camera import Camera
 from player.bullet import Bullet
 from enemy.enemy import Enemy
-from world.world import Tile
+from world.world import Tile, OtherObjects
 from functions import terminate, load_image
 
+#  Инициализация окна
 pygame.init()
 pygame.display.set_caption("Survive The Apocalypse")
 size = width, height = 1280, 720
@@ -23,13 +24,14 @@ flags = DOUBLEBUF
 FPS = 30
 screen = pygame.display.set_mode(size, flags, 16)
 
+#  Загрузка изображений
 PATH = 'resourses/sprites/zombie/'
 ZOMBIE_WALK = [pygame.transform.scale(pygame.image.load(image), (51, 65)).convert_alpha() for image in
                [PATH + 'Zombie_Walk1.png', PATH + 'Zombie_Walk2.png', PATH + 'Zombie_Walk3.png',
                 PATH + 'Zombie_Walk4.png', PATH + 'Zombie_Walk5.png', PATH + 'Zombie_Walk6.png',
                 PATH + 'Zombie_Walk7.png', PATH + 'Zombie_Walk8.png']]
 
-ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True).convert_alpha() for image in ZOMBIE_WALK]
+ZOMBIE_WALK_REVERSE = [pygame.transform.flip(image, flip_y=False, flip_x=True) .convert_alpha()for image in ZOMBIE_WALK]
 SAND_IMAGE = pygame.image.load('resourses/sprites/world/sand.jpg').convert_alpha()
 BULLET_IMAGE = pygame.transform.scale(load_image('resourses/sprites/player/bullet.png', -1), (30, 15))
 PATH = 'resourses/sprites/world/'
@@ -37,6 +39,7 @@ OTHER_OBJECTS_IMAGE = [pygame.transform.scale(pygame.image.load(image), (60, 60)
                        [PATH + file for file in os.listdir('resourses/sprites/world')]]
 
 
+#  Окно результатов
 def results_screen():
     results = [('Дата и время', 'Достигнутый уровень', 'Количество убийств')]
     database = sqlite3.connect('game_results.db')
@@ -77,6 +80,7 @@ def results_screen():
                     start_screen()
 
 
+#  Инициализация стартового окна
 def start_screen():
     font = pygame.font.SysFont('Comic Sans MS', 30)
     start_screen_fon = pygame.transform.scale(pygame.image.load('resourses/sprites/start_screen/start_screen_fon.jpg'),
@@ -105,7 +109,7 @@ def start_screen():
         pygame.display.flip()
         clock.tick(30)
 
-
+#  Инициализация окна проигрыша
 def end_game_screen(all_sprites, player, level):
     all_sprites.draw(screen)
     player.update_hp_bar(screen)
@@ -149,6 +153,7 @@ def end_game_screen(all_sprites, player, level):
                     start_screen()
 
 
+#  Окно паузы
 def pause_screen(player, level):
     pygame.draw.rect(screen, '#1e3130', (490, 235, 300, 250), border_radius=20)
     font = pygame.font.SysFont('Comic Sans MS', 20)
@@ -182,16 +187,16 @@ def pause_screen(player, level):
                     time.sleep(0.15)
                     return
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in restart_btn_rect:
-                    out = (
-                        str(datetime.today()), f'{level.level} ({level.level_progress[0]}/{level.level_progress[1]})',
-                        str(player.kills))
-                    insert_data_in_database('game_results.db', out)
+                    with open('results.txt', encoding='UTF-8', mode='a') as f:
+                        f.write(
+                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
+                            f' {player.kills}')
                     game()
                 if pygame.Rect(event.pos[0], event.pos[1], 1, 1) in exit_btn_rect:
-                    out = (
-                        str(datetime.today()), f'{level.level} ({level.level_progress[0]}/{level.level_progress[1]})',
-                        str(player.kills))
-                    insert_data_in_database('game_results.db', out)
+                    with open('results.txt', encoding='UTF-8', mode='a') as f:
+                        f.write(
+                            f'\n{datetime.today()}, {level.level} ({level.level_progress[0]}/{level.level_progress[1]}),'
+                            f' {player.kills}')
                     start_screen()
 
 
@@ -203,6 +208,7 @@ def insert_data_in_database(database_name, data):
     database.close()
 
 
+#  Основная функция игры
 def game():
     frames = 0
     last_shot = 0

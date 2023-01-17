@@ -3,6 +3,7 @@ import random
 import pygame
 
 
+#  Класс для создания фрагментов мира
 class Tile(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image, tiles_group, all_sprites):
@@ -11,7 +12,8 @@ class Tile(pygame.sprite.Sprite):
         self.image = image
         self.all_sprites = all_sprites
         self.rect = self.image.get_rect().move(x, y)
-
+    
+    #  Функция для применения смещения объекта 
     def apply_changes(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy
@@ -33,12 +35,13 @@ class Tile(pygame.sprite.Sprite):
             self.rect.y -= 720 + 80
             self.generate(random.choice(other_object_image), other_objects_group)
 
+    #  Функция для рандомной генерации объектов окружения
     def generate(self, other_object_image, other_objects_group):
         a = random.randint(1, 200)
         if a <= 4:
             OtherObjects(self.rect.x, self.rect.y, other_object_image, other_objects_group, self.all_sprites)
 
-
+#  Класс для создания объектов окружения 
 class OtherObjects(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image, other_objects_group, all_sprites):
